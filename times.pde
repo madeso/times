@@ -1,7 +1,13 @@
+int FRAMERATE = 10;
+float DT = 5.0f;
+
 int windowWidth = 730;
 int windowHeight = 420;
 float clockSize = 30;
 float clockBufferDistance = 1;
+int FRAMESTART = 100;
+
+int cframe = 0;
  
 int numClockColumns = floor(windowWidth/clockSize-clockBufferDistance);
 int numClockRows = floor(windowHeight/clockSize-clockBufferDistance);
@@ -9,19 +15,32 @@ Clock[][] clocks = new Clock[numClockColumns][numClockRows];
  
 void setup() {
   size(500,500);
+  frameRate(FRAMERATE);
   surface.setSize(windowWidth, windowHeight);
   for(int i=0; i<numClockColumns; i++) {
     for(int j=0; j<numClockRows; j++) {
-      clocks[i][j] = new Clock(map(i+1, 0, numClockColumns+1, 0, windowWidth), map(j+1, 0, numClockRows+1, 0, windowHeight), clockSize);
+      clocks[i][j] = new Clock(map(i+1, 0, numClockColumns+1, 0, windowWidth),
+        map(j+1, 0, numClockRows+1, 0, windowHeight),
+        clockSize);
+    }
+  }
+  
+  for(int f=0; f<FRAMESTART; ++f) {
+    ++cframe;
+    for(int i=0; i<numClockColumns; i++) {
+      for(int j=0; j<numClockRows; j++) {
+        clocks[i][j].update(DT);
+      }
     }
   }
 }
  
 void draw() {
   background(235);
+  ++cframe;
   for(int i=0; i<numClockColumns; i++) {
     for(int j=0; j<numClockRows; j++) {
-      clocks[i][j].update();
+      clocks[i][j].update(DT);
       clocks[i][j].draw();
     }
   }
@@ -40,9 +59,9 @@ class Clock {
     minuteHand = new Minute_Hand(x,y,d);
   }
  
-  void update() {
-    hourHand.turn();
-    minuteHand.turn();
+  void update(float dt) {
+    hourHand.turn(dt);
+    minuteHand.turn(dt);
   }
  
   void draw() {
@@ -72,9 +91,9 @@ class Hour_Hand {
     direction.rotate(PI/2);
   }
  
-  void turn() {
-    if(frameCount>direction.mag() || isCenterClock) {
-      direction.rotate(PI/-150);
+  void turn(float dt) {
+    if(cframe>direction.mag() || isCenterClock) {
+      direction.rotate(dt * ( PI/-150) );
     }
   }
  
@@ -104,9 +123,9 @@ class Minute_Hand {
     direction.rotate(PI/-2);
   }
  
-  void turn() {
-    if(frameCount>direction.mag() || isCenterClock) {
-      direction.rotate(PI/150);
+  void turn(float dt) {
+    if(cframe>direction.mag() || isCenterClock) {
+      direction.rotate(dt * (PI/150));
     }
   }
  
@@ -115,5 +134,7 @@ class Minute_Hand {
     strokeCap(ROUND);
     stroke(0);
     line(x,y,x+direction.setMag(null,l).x,y+direction.setMag(null,l).y);
+    // fill(0);
+    // text(direction.mag(), x,y);
   }
 }
