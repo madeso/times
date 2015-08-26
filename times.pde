@@ -6,11 +6,13 @@ int windowHeight = 420;
 float clockSize = 30;
 float clockBufferDistance = 1;
 int FRAMESTART = 400;
-boolean saveimage = true;
+boolean saveimage = false;
 
 // globals
 boolean running = false;
 int cframe = 0;
+int saveframeindex = 0;
+boolean calcsaveframes = true;
  
 int numClockColumns = floor(windowWidth/clockSize-clockBufferDistance);
 int numClockRows = floor(windowHeight/clockSize-clockBufferDistance);
@@ -63,13 +65,22 @@ void draw() {
     }
   }
   
-  if( saveimage && Math.abs(cclock.hourHand.rot) > 2* PI ) {
+  if( Math.abs(cclock.hourHand.rot) > 2* PI ) {
     // when the hour hand has turned a whole turn, stop saving
-    saveimage = false;
-    println("Stopping image saving");
+    if( saveimage ) {
+      saveimage = false;
+      println("Stopping image saving");
+    }
+    if( calcsaveframes ) {
+      calcsaveframes = false;
+      println(String.format("Calculated %d frames of animation", saveframeindex));
+    }
   }
   if( saveimage ) {
     saveFrame("out/clock-######.png");
+  }
+  if( calcsaveframes ) {
+    ++saveframeindex;
   }
 }
  
