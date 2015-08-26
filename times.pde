@@ -1,17 +1,21 @@
+// tweaks
 int FRAMERATE = 60;
 float DT = 1.0f;
-
 int windowWidth = 730;
 int windowHeight = 420;
 float clockSize = 30;
 float clockBufferDistance = 1;
 int FRAMESTART = 400;
+boolean saveimage = false;
 
+// globals
+boolean running = false;
 int cframe = 0;
  
 int numClockColumns = floor(windowWidth/clockSize-clockBufferDistance);
 int numClockRows = floor(windowHeight/clockSize-clockBufferDistance);
 Clock[][] clocks = new Clock[numClockColumns][numClockRows];
+Clock cclock = null;
  
 void setup() {
   size(500,500);
@@ -23,6 +27,13 @@ void setup() {
         map(j+1, 0, numClockRows+1, 0, windowHeight),
         clockSize);
     }
+  }
+  
+  for(int i=0; i<numClockColumns; i++) {
+      for(int j=0; j<numClockRows; j++) {
+        if( clocks[i][j].isCenterClock() )
+        cclock = clocks[i][j];
+      }
   }
   
   for(int f=0; f<FRAMESTART; ++f) {
@@ -44,6 +55,14 @@ void draw() {
       clocks[i][j].draw();
     }
   }
+  
+  if( cclock != null && cclock.hourHand.rot > 2* PI ) {
+    // when the hour hand has turned a whole turn, stop saving
+    saveimage = false;
+  }
+  if( saveimage ) {
+    saveFrame("out/clock-######.png");
+  }
 }
  
 class Clock {
@@ -57,6 +76,10 @@ class Clock {
     d=d_;
     hourHand = new Hour_Hand(x,y,d);
     minuteHand = new Minute_Hand(x,y,d);
+  }
+  
+  boolean isCenterClock() {
+    return x==windowWidth/2 && y==windowHeight/2;
   }
  
   void update(float dt) {
@@ -77,6 +100,7 @@ class Hour_Hand {
   float x,y,l;
   PVector direction;
   boolean isCenterClock;
+  float rot;
  
   Hour_Hand(float x_, float y_, float d_) {
     x=x_;
@@ -89,11 +113,17 @@ class Hour_Hand {
       direction = new PVector(l,0);
     }
     direction.rotate(PI/2);
+    rot = 0;
   }
  
   void turn(float dt) {
     if(cframe>direction.mag() || isCenterClock) {
       direction.rotate(dt * ( PI/-150) );
+      if(frameCount > 0 ) {
+        // frameCount is 0 during setup, only count rotation
+        // during running and not during the setup dry rotation
+        rot += dt * ( PI/-150);
+      }
     }
   }
  
