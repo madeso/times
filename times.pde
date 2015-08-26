@@ -1,6 +1,6 @@
 // tweaks
-int FRAMERATE = 60;
-float DT = 1.0f;
+int FRAMERATE = 10;
+float DT = 6.0f;
 int windowWidth = 730;
 int windowHeight = 420;
 float clockSize = 30;
