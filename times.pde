@@ -6,7 +6,7 @@ int windowHeight = 420;
 float clockSize = 30;
 float clockBufferDistance = 1;
 int FRAMESTART = 400;
-boolean saveimage = false;
+boolean saveimage = true;
 
 // globals
 boolean running = false;
@@ -29,11 +29,18 @@ void setup() {
     }
   }
   
+  cclock = null;
   for(int i=0; i<numClockColumns; i++) {
-      for(int j=0; j<numClockRows; j++) {
-        if( clocks[i][j].isCenterClock() )
+    for(int j=0; j<numClockRows; j++) {
+      if( clocks[i][j].isCenterClock() ) {
         cclock = clocks[i][j];
+        println("Found center clock");
       }
+    }
+  }
+  if( cclock == null && saveimage) {
+    println("No center found, aborting image saving");
+    saveimage = false;
   }
   
   for(int f=0; f<FRAMESTART; ++f) {
@@ -56,9 +63,10 @@ void draw() {
     }
   }
   
-  if( cclock != null && cclock.hourHand.rot > 2* PI ) {
+  if( saveimage && cclock.hourHand.rot > 2* PI ) {
     // when the hour hand has turned a whole turn, stop saving
     saveimage = false;
+    println("Stopping image saving");
   }
   if( saveimage ) {
     saveFrame("out/clock-######.png");
