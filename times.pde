@@ -1,11 +1,11 @@
-int FRAMERATE = 10;
-float DT = 5.0f;
+int FRAMERATE = 60;
+float DT = 1.0f;
 
 int windowWidth = 730;
 int windowHeight = 420;
 float clockSize = 30;
 float clockBufferDistance = 1;
-int FRAMESTART = 100;
+int FRAMESTART = 400;
 
 int cframe = 0;
  
