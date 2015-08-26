@@ -63,7 +63,7 @@ void draw() {
     }
   }
   
-  if( saveimage && cclock.hourHand.rot > 2* PI ) {
+  if( saveimage && Math.abs(cclock.hourHand.rot) > 2* PI ) {
     // when the hour hand has turned a whole turn, stop saving
     saveimage = false;
     println("Stopping image saving");
